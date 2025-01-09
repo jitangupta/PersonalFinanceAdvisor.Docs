@@ -1,0 +1,48 @@
+graph TB
+    subgraph "Client Layer"
+        Web[React Web App]
+    end
+
+    subgraph "API Gateway Layer"
+        Gateway[API Gateway]
+    end
+
+    subgraph "User Service"
+        US[".NET Core API"]
+        MSSQL[(MS SQL)]
+        US --> MSSQL
+    end
+
+    subgraph "Transaction Service"
+        TS[".NET Core API"]
+        FileP[File Processor]
+        Cat[Categorization Engine]
+        CDB[(Cosmos DB)]
+        TS --> FileP
+        FileP --> Cat
+        Cat --> CDB
+    end
+
+    subgraph "Insights Service"
+        IS["Python FastAPI"]
+        ML[ML Models]
+        MongoDB[(MongoDB)]
+        IS --> ML
+        ML --> MongoDB
+    end
+
+    subgraph "Notification Service"
+        MQ[RabbitMQ]
+        AF1[Azure Function - Email]
+        AF2[Azure Function - SMS]
+        MQ --> AF1
+        MQ --> AF2
+    end
+
+    Web --> Gateway
+    Gateway --> US
+    Gateway --> TS
+    Gateway --> IS
+    
+    TS --> MQ
+    IS --> MQ
