@@ -1,0 +1,33 @@
+flowchart TD
+    subgraph GitHub["GitHub Repositories"]
+        Dev["Develop Branch"]
+        Main["Main Branch"]
+    end
+    
+    subgraph Azure["Azure Resources"]
+        subgraph AKS["Azure Kubernetes Service"]
+            DevEnv["Dev Environment"]
+            ProdEnv["Prod Environment"]
+        end
+        ACR["Azure Container Registry"]
+    end
+    
+    subgraph ArgoCD["ArgoCD"]
+        ArgoDev["ArgoCD Dev Project"]
+        ArgoProd["ArgoCD Prod Project"]
+    end
+    
+    Dev -->|Push Trigger| GHADev["GitHub Actions\nDev Pipeline"]
+    Main -->|PR Merge Trigger| GHAProd["GitHub Actions\nProd Pipeline"]
+    
+    GHADev -->|Build & Push| ACR
+    GHAProd -->|Build & Push| ACR
+    
+    ACR -->|Pull Images| DevEnv
+    ACR -->|Pull Images| ProdEnv
+    
+    GHADev -->|Update Manifests| ArgoDev
+    GHAProd -->|Update Manifests| ArgoProd
+    
+    ArgoDev -->|Deploy| DevEnv
+    ArgoProd -->|Deploy| ProdEnv
